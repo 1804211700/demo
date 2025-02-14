@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新年快乐</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+        }
+
+        #fireworks {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2;
+        }
+
+        h1 {
+            font-size: 6rem;
+            background: linear-gradient(90deg, #ff0099, #ff6600, #ffdd00, #00ff00, #00ffff, #0033ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 10px #ff0099, 0 0 20px #ff6600, 0 0 30px #ffdd00, 0 0 40px #00ff00, 0 0 50px #00ffff, 0 0 60px #0033ff, 0 0 70px #ff00ff;
+            }
+            100% {
+                text-shadow: 0 0 20px #ff0099, 0 0 30px #ff6600, 0 0 40px #ffdd00, 0 0 50px #00ff00, 0 0 60px #00ffff, 0 0 70px #0033ff, 0 0 80px #ff00ff;
+            }
+        }
+
+        #year {
+            font-size: 4rem;
+            color: #fff;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="fireworks"></div>
+    <div class="content">
+        <h1>新年快乐</h1>
+        <div id="year">2024</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // 烟花效果
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('fireworks').appendChild(renderer.domElement);
+
+        const particles = [];
+        const particleCount = 1000;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = new THREE.Mesh(
+                new THREE.SphereGeometry(0.1, 16, 16),
+                new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff })
+            );
+            particle.position.set(Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50);
+            particle.velocity = new THREE.Vector3(
+                (Math.random() - 0.5) * 0.1,
+                (Math.random() - 0.5) * 0.1,
+                (Math.random() - 0.5) * 0.1
+            );
+            particles.push(particle);
+            scene.add(particle);
+        }
+
+        camera.position.z = 50;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.forEach(particle => {
+                particle.position.add(particle.velocity);
+                if (particle.position.x > 50 || particle.position.x < -50) particle.velocity.x *= -1;
+                if (particle.position.y > 50 || particle.position.y < -50) particle.velocity.y *= -1;
+                if (particle.position.z > 50 || particle.position.z < -50) particle.velocity.z *= -1;
+            });
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // 动态年份
+        const yearElement = document.getElementById('year');
+        let year = 2024;
+        setInterval(() => {
+            yearElement.textContent = year++;
+        }, 1000);
+    </script>
+</body>
+</html>
