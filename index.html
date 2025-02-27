@@ -3,120 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新年快乐</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <title>一封信</title>
     <style>
-        body, html {
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
             margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Dancing Script', cursive;
-            background: #000;
-            color: #fff;
+            font-family: Arial, sans-serif;
         }
-
-        #fireworks {
+        .envelope {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            background: url('https://via.placeholder.com/300x400/fff/ccc?text=Envelope') no-repeat center center/cover;
+            border: 2px solid #666;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.5s ease;
+        }
+        .envelope.open {
+            transform: rotateX(180deg);
+        }
+        .letter {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
+            background: url('https://via.placeholder.com/300x400/fff/fff?text=Ginkgo+Forest') no-repeat center center/cover;
+            transform: rotateY(180deg);
+            transform-origin: top;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            color: white;
+            font-size: 18px;
+            line-height: 1.5;
         }
-
-        .content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 2;
+        .letter.show {
+            transform: rotateY(0deg);
+            opacity: 1;
         }
-
-        h1 {
-            font-size: 6rem;
-            color: #ffd700; /* 金色 */
-            animation: glow 2s infinite alternate;
+        .letter span {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
-
-        @keyframes glow {
-            0% {
-                text-shadow: 0 0 10px rgba(255, 215, 0, 0.7), 0 0 20px rgba(255, 215, 0, 0.5);
-            }
-            100% {
-                text-shadow: 0 0 20px rgba(255, 215, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.7);
-            }
+        .letter.show span {
+            opacity: 1;
+            transform: translateY(0);
         }
-
-        #year {
-            font-size: 4rem;
-            color: #ff6347; /* 番茄红 */
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
+        .letter.show span:nth-child(n) {
+            transition-delay: calc(0.1s * (n - 1));
         }
     </style>
 </head>
 <body>
-    <div id="fireworks"></div>
-    <div class="content">
-        <h1>新年快乐</h1>
-        <div id="year">2024</div>
+    <div class="envelope" onclick="openLetter()">
+        <div class="letter" id="letter">
+            <span>亲爱的朋友，</span><br>
+            <span>这是一封来自银杏树林的信。</span><br>
+            <span>愿你的心情如这金黄的银杏叶一般，明媚而温暖。</span><br>
+            <span>祝你每天开心快乐！</span><br>
+            <span>你的朋友</span>
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        // 烟花效果
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('fireworks').appendChild(renderer.domElement);
-
-        const particles = [];
-        const particleCount = 1000;
-
-        for (let i = 0; i < particleCount; i++) {
-            const particle = new THREE.Mesh(
-                new THREE.SphereGeometry(0.1, 16, 16),
-                new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff })
-            );
-            particle.position.set(Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50);
-            particle.velocity = new THREE.Vector3(
-                (Math.random() - 0.5) * 0.1,
-                (Math.random() - 0.5) * 0.1,
-                (Math.random() - 0.5) * 0.1
-            );
-            particles.push(particle);
-            scene.add(particle);
+        function openLetter() {
+            const envelope = document.querySelector('.envelope');
+            const letter = document.getElementById('letter');
+            envelope.classList.add('open');
+            envelope.addEventListener('transitionend', () => {
+                letter.classList.add('show');
+            }, { once: true });
         }
-
-        camera.position.z = 50;
-
-        function animate() {
-            requestAnimationFrame(animate);
-            particles.forEach(particle => {
-                particle.position.add(particle.velocity);
-                if (particle.position.x > 50 || particle.position.x < -50) particle.velocity.x *= -1;
-                if (particle.position.y > 50 || particle.position.y < -50) particle.velocity.y *= -1;
-                if (particle.position.z > 50 || particle.position.z < -50) particle.velocity.z *= -1;
-            });
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // 动态年份
-        const yearElement = document.getElementById('year');
-        let year = 2024;
-        setInterval(() => {
-            yearElement.textContent = year++;
-        }, 1000);
     </script>
 </body>
 </html>
